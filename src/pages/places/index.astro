@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+const entries = (await getCollection("places", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
+);
+---
+
+<Layout
+  title="Places | Beautiful Iowa"
+  description="The Beautiful Iowa gazetteer: standing pages for the parks, forests, rivers, bluffs, and landmarks that make Iowa's scenery."
+>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section class="border-border border-b pt-10 pb-8">
+      <h1 class="font-display text-5xl font-semibold">Places</h1>
+      <p class="mt-4 max-w-prose text-lg">
+        The parks, forests, rivers, bluffs, and landmarks that give Iowa its
+        scenery. Field notes tell the story of a visit; these pages are the
+        gazetteer — what each place is, where it is, and why it is worth the
+        drive — kept standing here where they can be searched and kept.
+      </p>
+    </section>
+    <ul>
+      {
+        entries.map(e => (
+          <li class="border-border border-b py-7">
+            <p class="text-muted-foreground text-sm">
+              {e.data.place}, {e.data.county}
+              {e.data.region ? ` — ${e.data.region}` : ""}
+            </p>
+            <h2 class="font-display mt-2 text-3xl font-semibold">
+              <a class="hover:text-accent" href={`/places/${e.id}/`}>
+                {e.data.title}
+              </a>
+            </h2>
+            <p class="mt-2 max-w-prose">{e.data.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+  <Footer />
+</Layout>
