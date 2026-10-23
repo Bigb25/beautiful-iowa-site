@@ -8,10 +8,12 @@ const byDateDesc = (a: { data: { pubDatetime: Date } }, b: { data: { pubDatetime
   b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime();
 
 const towns = (await getCollection("towns", ({ data }) => !data.draft)).sort(byDateDesc);
+const places = (await getCollection("places", ({ data }) => !data.draft)).sort(byDateDesc);
 const notes = (await getCollection("field-notes", ({ data }) => !data.draft)).sort(byDateDesc);
 const films = (await getCollection("videos", ({ data }) => !data.draft)).sort(byDateDesc);
 
 const currentTown = towns[0];
+const latestPlace = places[0];
 
 const fmt = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
@@ -20,12 +22,15 @@ const fmt = (d: Date) =>
 <Layout>
   <Header />
   <main id="main-content" class="app-layout">
-    <section aria-label="Downtown Newton in 1940">
+    <section aria-label="Sunrise over the Mississippi River at Effigy Mounds">
       <figure class="relative left-1/2 w-screen max-w-none -translate-x-1/2">
         <div class="relative">
           <img
-            src="/images/newton-downtown-1940.jpg"
-            alt="Downtown Newton, Iowa, photographed from above the street in April 1940: storefront signs for Western Union and Kodak Film, a shoe repair shop, bicycles at the curb."
+            src="/images/effigy-mounds-fire-point.jpg"
+            alt="Sunrise over the Mississippi River seen from Fire Point at Effigy Mounds National Monument: golden light on the water, wooded bluffs, and the wide river valley below."
+            width="1920"
+            height="1266"
+            fetchpriority="high"
             class="h-[62vh] w-full object-cover"
           />
           <div
@@ -43,9 +48,9 @@ const fmt = (d: Date) =>
           </div>
         </div>
         <figcaption class="app-layout text-muted-foreground mt-3 text-sm">
-          Downtown Newton in April 1940, photographed by John Vachon for the
-          Farm Security Administration. Library of Congress, no known
-          restrictions.
+          Sunrise over the Mississippi River from Fire Point, Effigy Mounds
+          National Monument. Photograph by Eaton Coté, National Park Service,
+          public domain.
         </figcaption>
       </figure>
     </section>
@@ -76,6 +81,40 @@ const fmt = (d: Date) =>
           <p class="mt-5">
             <a class="text-accent underline underline-offset-4" href="/towns/">
               Read the town archive
+            </a>
+          </p>
+        </section>
+      )
+    }
+
+    {
+      latestPlace && (
+        <section class="border-border border-b py-10">
+          <h2 class="font-display text-3xl font-semibold">Places</h2>
+          <p class="text-muted-foreground mt-3 text-sm">
+            {latestPlace.data.place}, {latestPlace.data.county}
+            {latestPlace.data.region ? ` — ${latestPlace.data.region}` : ""}
+          </p>
+          {latestPlace.data.heroImage && (
+            <figure class="mt-4">
+              <img
+                src={latestPlace.data.heroImage}
+                alt={latestPlace.data.heroCaption ?? ""}
+                width={latestPlace.data.heroImageWidth}
+                height={latestPlace.data.heroImageHeight}
+                class="w-full"
+              />
+            </figure>
+          )}
+          <h3 class="font-display mt-4 text-4xl leading-tight font-semibold">
+            <a class="hover:text-accent" href={`/places/${latestPlace.id}/`}>
+              {latestPlace.data.title}
+            </a>
+          </h3>
+          <p class="mt-3 max-w-prose">{latestPlace.data.description}</p>
+          <p class="mt-5">
+            <a class="text-accent underline underline-offset-4" href="/places/">
+              See all the places
             </a>
           </p>
         </section>
