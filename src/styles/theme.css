@@ -16,6 +16,7 @@
    Harvest Gold spent sparingly (rules, markers, the endmark). */
 :root,
 [data-theme="light"] {
+  color-scheme: light;
   --background: #f7f1e3;
   --foreground: #262a22;
   --accent: #1e3a2a;
@@ -28,6 +29,7 @@
 /* Dark theme values — Bottomland: the green deepened to near-black,
    cream text, and Harvest Gold takes over as the accent. */
 [data-theme="dark"] {
+  color-scheme: dark;
   --background: #14231b;
   --foreground: #f3edda;
   --accent: #c19a3d;
