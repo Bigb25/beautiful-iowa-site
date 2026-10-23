@@ -8,7 +8,10 @@ const entries = (
   await getCollection("field-notes", ({ data }) => !data.draft)
 ).sort((a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime());
 const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+  new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(d);
 ---
 
 <Layout
@@ -21,9 +24,9 @@ const fmt = (d: Date) =>
       <h1 class="font-display text-5xl font-semibold">Field notes</h1>
       <p class="mt-4 max-w-prose text-lg">
         Most drives are just drives, until one of them turns into a stop: a
-        state park gate left open, a marker everyone passes and nobody reads,
-        a main street worth walking twice. When that happens, the stop becomes
-        a note here, written up with the photographs we took standing there.
+        state park gate left open, a marker everyone passes and nobody reads, a
+        main street worth walking twice. When that happens, the stop becomes a
+        note here, written up with the photographs we took standing there.
       </p>
     </section>
     <ul>

@@ -126,7 +126,10 @@ const isActive = (path: string) => {
                 title={t.nav.archives}
                 aria-label={t.nav.archives}
               >
-                <IconArchive aria-hidden="true" class="hidden sm:absolute sm:top-1/2 sm:left-1/2 sm:block sm:size-6 sm:-translate-x-1/2 sm:-translate-y-1/2" />
+                <IconArchive
+                  aria-hidden="true"
+                  class="hidden sm:absolute sm:top-1/2 sm:left-1/2 sm:block sm:size-6 sm:-translate-x-1/2 sm:-translate-y-1/2"
+                />
                 <span class="sm:sr-only">{t.nav.archives}</span>
                 {isActive("/archives") && (
                   <IconUnderline
@@ -147,7 +150,10 @@ const isActive = (path: string) => {
                 title={t.nav.search}
                 aria-label={t.nav.search}
               >
-                <IconSearch aria-hidden="true" class="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" />
+                <IconSearch
+                  aria-hidden="true"
+                  class="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2"
+                />
                 <span class="sr-only">{t.nav.search}</span>
                 {isActive("/search") && (
                   <IconUnderline
@@ -169,8 +175,14 @@ const isActive = (path: string) => {
                 aria-label={t.a11y.toggleTheme}
                 aria-live="polite"
               >
-                <IconMoon aria-hidden="true" class="absolute top-[50%] left-[50%] translate-[-50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                <IconSunHigh aria-hidden="true" class="absolute top-[50%] left-[50%] translate-[-50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                <IconMoon
+                  aria-hidden="true"
+                  class="absolute top-[50%] left-[50%] translate-[-50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+                />
+                <IconSunHigh
+                  aria-hidden="true"
+                  class="absolute top-[50%] left-[50%] translate-[-50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+                />
               </button>
             </li>
           )

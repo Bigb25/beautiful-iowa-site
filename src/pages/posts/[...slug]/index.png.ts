@@ -32,9 +32,10 @@ export const GET: APIRoute = async ({ props }) => {
      src/pages/og.png.ts for the full note. */
   /* Fonts are vendored in the source tree; resolve from the project root
    (the build always runs there), not from the bundled chunk location. */
-const fontPath = (name: string) => join(process.cwd(), "src/assets/fonts", name);
+  const fontPath = (name: string) =>
+    join(process.cwd(), "src/assets/fonts", name);
 
-const toArrayBuffer = (buf: Buffer): ArrayBuffer =>
+  const toArrayBuffer = (buf: Buffer): ArrayBuffer =>
     buf.buffer.slice(
       buf.byteOffset,
       buf.byteOffset + buf.byteLength

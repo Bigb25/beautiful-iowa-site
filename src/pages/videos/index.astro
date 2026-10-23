@@ -8,7 +8,10 @@ const entries = (await getCollection("videos", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
 );
 const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+  new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(d);
 ---
 
 <Layout
@@ -21,9 +24,9 @@ const fmt = (d: Date) =>
       <h1 class="font-display text-5xl font-semibold">The films</h1>
       <p class="mt-4 max-w-prose text-lg">
         The Beautiful Iowa channel tells two kinds of stories on film: town
-        stories, built from the photographs and records a place left behind,
-        and field films from the road. Each one gets a page here, with the
-        story behind it and the sources for everything it shows. Watch on
+        stories, built from the photographs and records a place left behind, and
+        field films from the road. Each one gets a page here, with the story
+        behind it and the sources for everything it shows. Watch on
         <a
           class="text-accent underline underline-offset-4"
           href="https://www.youtube.com/@BeautifulIowa">YouTube</a
