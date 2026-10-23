@@ -37,6 +37,9 @@ jobs:
           echo "DIFF_STAT_BEGIN"
           git diff --stat
           echo "DIFF_STAT_END"
+          echo "STRICT_FILES_PATCH_BEGIN"
+          git diff -- .github/workflows/deploy.yml src/content/towns/newton-jasper-county.md
+          echo "STRICT_FILES_PATCH_END"
           echo "DIFF_IGNORE_SPACE_BEGIN"
           git diff --ignore-all-space --stat
           echo "DIFF_IGNORE_SPACE_END"
