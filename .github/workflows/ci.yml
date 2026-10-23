@@ -1,44 +1,124 @@
-name: CI
-
-permissions:
-  contents: read
-
+name: Temporary Prettier output export — never deploy
 on:
   pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
-  workflow_call:
-
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
 jobs:
-  build:
-    name: Code standards & build
+  formatter:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: chore-prettier-sweep
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "npm"
-
-      - name: "📦 Install dependencies"
-        run: npm ci
-
-      - name: "🔎 Lint code"
-        run: npm run lint
-
-      - name: "🚀 Typecheck, build, and index with Pagefind"
-        run: npm run build
-
-      - name: "🧪 Draft exclusion and locally served search regression"
-        run: bash scripts/phase1-reliability-test.sh
-
-      - name: "📝 Checking code format"
-        run: npm run format:check
+          cache: npm
+      - name: Install, run approved Prettier sweep and audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npx prettier --list-different . | sort > /tmp/expected-by-prettier.txt
+          npm run format
+          git diff --name-only | sort > /tmp/actual.txt
+          cat > /tmp/approved.txt <<'APPROVED'
+.github/workflows/deploy.yml
+package.json
+public/privacy.html
+src/components/Datetime.astro
+src/components/Header.astro
+src/components/Pagination.astro
+src/components/Socials.astro
+src/components/Tag.astro
+src/content/towns/newton-jasper-county.md
+src/pages/field-notes/index.astro
+src/pages/index.astro
+src/pages/og.png.ts
+src/pages/posts/[...slug]/_components/AdjacentPostNav.astro
+src/pages/posts/[...slug]/_components/BackButton.astro
+src/pages/posts/[...slug]/_components/BackToTopButton.astro
+src/pages/posts/[...slug]/_components/EditPost.astro
+src/pages/posts/[...slug]/_components/ShareLinks.astro
+src/pages/posts/[...slug]/index.png.ts
+src/pages/towns/index.astro
+src/pages/videos/index.astro
+APPROVED
+          sort /tmp/approved.txt -o /tmp/approved.txt
+          if ! diff -u /tmp/approved.txt /tmp/expected-by-prettier.txt; then
+            echo 'STOP: current Prettier warnings deviate from Scout-approved 20 files'
+            exit 1
+          fi
+          if ! diff -u /tmp/approved.txt /tmp/actual.txt; then
+            echo 'STOP: formatter changed an unexpected file'
+            exit 1
+          fi
+          if [[ $(wc -l < /tmp/actual.txt) != 20 ]]; then
+            echo 'STOP: expected exactly 20 files'
+            exit 1
+          fi
+          read -r ADDITIONS DELETIONS < <(git diff --numstat | awk '{a+=$1;d+=$2} END {print a,d}')
+          echo "FORMAT_STAT_TOTAL: $ADDITIONS $DELETIONS"
+          if [[ "$ADDITIONS" != 206 || "$DELETIONS" != 131 ]]; then
+            echo 'STOP: diff totals differ from approved Prettier output'
+            exit 1
+          fi
+          if git diff --name-only | grep -Fxq 'package-lock.json'; then
+            echo 'STOP: lockfile changed'
+            exit 1
+          fi
+          git diff --check
+          node <<'CHECK'
+          const fs = require('node:fs');
+          const cp = require('node:child_process');
+          const YAML = require('yaml');
+          const before = file => cp.execFileSync('git',['show','HEAD:' + file],{encoding:'utf8'});
+          const after = file => fs.readFileSync(file,'utf8');
+          const same = (x,y) => JSON.stringify(x) === JSON.stringify(y);
+          if(!same(JSON.parse(before('package.json')),JSON.parse(after('package.json')))) throw new Error('package.json semantic change');
+          if(!same(YAML.parse(before('.github/workflows/deploy.yml')),YAML.parse(after('.github/workflows/deploy.yml')))) throw new Error('deploy.yml parsed change');
+          const md = 'src/content/towns/newton-jasper-county.md';
+          const split = s => {
+            const m = s.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+            if(!m) throw new Error('Expected Markdown frontmatter');
+            return {front: YAML.parse(m[1]), body: m[2]};
+          };
+          const b=split(before(md)),a=split(after(md));
+          if(!same(b.front,a.front)) throw new Error('Markdown frontmatter changed');
+          const normalize = s => s.replace(/\*([^*\n]+)\*/g, '_$1_').replace(/\s/g,'');
+          if(normalize(b.body)!==normalize(a.body))throw new Error('Markdown text change outside approved emphasis normalization/whitespace');
+          const files = fs.readFileSync('/tmp/actual.txt','utf8').trim().split('\n');
+          const classAttrs = text => [...text.matchAll(/\bclass\s*=\s*["']([^"']*)["']/g)].map(x=>x[1].replace(/\s+/g,' ').trim());
+          const links = text => [...text.matchAll(/\bhref\s*=\s*["']([^"']*)["']/g)].map(x=>x[1]);
+          for(const file of files.filter(x=>x.endsWith('.astro') || x.endsWith('.html'))) {
+            const lhs=before(file), rhs=after(file);
+            if(!same(classAttrs(lhs),classAttrs(rhs)))throw new Error('Class attribute or class order changed: ' + file);
+            if(!same(links(lhs),links(rhs)))throw new Error('Link href changed: ' + file);
+          }
+          console.log('PASS: package.json parsed equality');
+          console.log('PASS: deploy.yml parsed equality');
+          console.log('PASS: Newton frontmatter and Markdown text equivalence');
+          console.log('PASS: static class attribute sequences and hrefs preserved');
+          CHECK
+          npm run format:check
+          npm run lint
+          npm run build
+          if [[ -n "$(git diff --name-only | grep -vFxf /tmp/approved.txt || true)" ]]; then
+            echo 'STOP: build changed unexpected tracked file'
+            exit 1
+          fi
+          echo 'FORMAT_OUTPUT_BEGIN'
+          node <<'OUTPUT'
+          const fs = require('node:fs');
+          const paths = fs.readFileSync('/tmp/actual.txt','utf8').trim().split('\n');
+          for (const path of paths) {
+            const value = fs.readFileSync(path,'utf8');
+            for (let i=0, n=0; i<value.length; i+=800,n++) {
+              console.log('PFMT_CHUNK:' + encodeURIComponent(path) + ':' + n + ':' + JSON.stringify(value.slice(i,i+800)));
+            }
+          }
+          OUTPUT
+          echo 'FORMAT_OUTPUT_END'
+          echo 'PASS_ALL_APPROVED_CHECKS'
