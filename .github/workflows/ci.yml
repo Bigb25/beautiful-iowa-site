@@ -25,27 +25,27 @@ jobs:
           npm run format
           git diff --name-only | sort > /tmp/actual.txt
           cat > /tmp/approved.txt <<'APPROVED'
-.github/workflows/deploy.yml
-package.json
-public/privacy.html
-src/components/Datetime.astro
-src/components/Header.astro
-src/components/Pagination.astro
-src/components/Socials.astro
-src/components/Tag.astro
-src/content/towns/newton-jasper-county.md
-src/pages/field-notes/index.astro
-src/pages/index.astro
-src/pages/og.png.ts
-src/pages/posts/[...slug]/_components/AdjacentPostNav.astro
-src/pages/posts/[...slug]/_components/BackButton.astro
-src/pages/posts/[...slug]/_components/BackToTopButton.astro
-src/pages/posts/[...slug]/_components/EditPost.astro
-src/pages/posts/[...slug]/_components/ShareLinks.astro
-src/pages/posts/[...slug]/index.png.ts
-src/pages/towns/index.astro
-src/pages/videos/index.astro
-APPROVED
+          .github/workflows/deploy.yml
+          package.json
+          public/privacy.html
+          src/components/Datetime.astro
+          src/components/Header.astro
+          src/components/Pagination.astro
+          src/components/Socials.astro
+          src/components/Tag.astro
+          src/content/towns/newton-jasper-county.md
+          src/pages/field-notes/index.astro
+          src/pages/index.astro
+          src/pages/og.png.ts
+          src/pages/posts/[...slug]/_components/AdjacentPostNav.astro
+          src/pages/posts/[...slug]/_components/BackButton.astro
+          src/pages/posts/[...slug]/_components/BackToTopButton.astro
+          src/pages/posts/[...slug]/_components/EditPost.astro
+          src/pages/posts/[...slug]/_components/ShareLinks.astro
+          src/pages/posts/[...slug]/index.png.ts
+          src/pages/towns/index.astro
+          src/pages/videos/index.astro
+          APPROVED
           sort /tmp/approved.txt -o /tmp/approved.txt
           if ! diff -u /tmp/approved.txt /tmp/expected-by-prettier.txt; then
             echo 'STOP: current Prettier warnings deviate from Scout-approved 20 files'
