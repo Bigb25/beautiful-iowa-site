@@ -4,6 +4,7 @@ export interface UIStrings {
     posts: string;
     tags: string;
     towns: string;
+    places: string;
     fieldNotes: string;
     videos: string;
     about: string;
