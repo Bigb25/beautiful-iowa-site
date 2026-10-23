@@ -1,0 +1,143 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+const byDateDesc = (a: { data: { pubDatetime: Date } }, b: { data: { pubDatetime: Date } }) =>
+  b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime();
+
+const towns = (await getCollection("towns", ({ data }) => !data.draft)).sort(byDateDesc);
+const notes = (await getCollection("field-notes", ({ data }) => !data.draft)).sort(byDateDesc);
+const films = (await getCollection("videos", ({ data }) => !data.draft)).sort(byDateDesc);
+
+const currentTown = towns[0];
+
+const fmt = (d: Date) =>
+  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+---
+
+<Layout>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section aria-label="Downtown Newton in 1940">
+      <figure class="relative left-1/2 w-screen max-w-none -translate-x-1/2">
+        <div class="relative">
+          <img
+            src="/images/newton-downtown-1940.jpg"
+            alt="Downtown Newton, Iowa, photographed from above the street in April 1940: storefront signs for Western Union and Kodak Film, a shoe repair shop, bicycles at the curb."
+            class="h-[62vh] w-full object-cover"
+          />
+          <div
+            class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1e3a2a]/85 via-[#1e3a2a]/35 to-transparent pt-24 pb-6"
+          >
+            <div class="app-layout">
+              <h1 class="font-display text-6xl font-semibold text-[#f7f1e3] sm:text-7xl">
+                Beautiful Iowa
+              </h1>
+              <p class="font-display mt-3 max-w-prose text-xl text-[#f7f1e3]/90 italic">
+                River bluffs and state parks, small-town main streets and back
+                roads, and the stories they keep.
+              </p>
+            </div>
+          </div>
+        </div>
+        <figcaption class="app-layout text-muted-foreground mt-3 text-sm">
+          Downtown Newton in April 1940, photographed by John Vachon for the
+          Farm Security Administration. Library of Congress, no known
+          restrictions.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="border-border border-b py-10">
+      <p class="max-w-prose text-lg">
+        Welcome to Beautiful Iowa. This is Iowa the way Iowans see it: the
+        overlooks and the waterfalls, the courthouses and the covered bridges,
+        the quiet places and the famous ones. The films live on YouTube; this
+        site is their permanent home, and the home of the town archive and the
+        field notes, where everything can be searched and kept.
+      </p>
+    </section>
+    {
+      currentTown && (
+        <section class="border-border border-b py-10">
+          <h2 class="font-display text-3xl font-semibold">From the town archive</h2>
+          <p class="text-muted-foreground mt-3 text-sm">
+            {currentTown.data.town}, {currentTown.data.county}, in the week of{" "}
+            {fmt(currentTown.data.pubDatetime)}
+          </p>
+          <h3 class="font-display mt-2 text-4xl leading-tight font-semibold">
+            <a class="hover:text-accent" href={`/towns/${currentTown.id}/`}>
+              {currentTown.data.title}
+            </a>
+          </h3>
+          <p class="mt-3 max-w-prose">{currentTown.data.description}</p>
+          <p class="mt-5">
+            <a class="text-accent underline underline-offset-4" href="/towns/">
+              Read the town archive
+            </a>
+          </p>
+        </section>
+      )
+    }
+
+    {
+      notes.length > 0 && (
+        <section class="border-border border-b py-10">
+          <h2 class="font-display text-3xl font-semibold">Field notes</h2>
+          <ul>
+            {notes.slice(0, 3).map(e => (
+              <li class="border-border border-b py-6 last:border-b-0">
+                <p class="text-muted-foreground text-sm">
+                  {e.data.location}, on {fmt(e.data.pubDatetime)}
+                </p>
+                <h3 class="font-display mt-1 text-2xl font-semibold">
+                  <a class="hover:text-accent" href={`/field-notes/${e.id}/`}>
+                    {e.data.title}
+                  </a>
+                </h3>
+                <p class="mt-1 max-w-prose">{e.data.description}</p>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-2">
+            <a class="text-accent underline underline-offset-4" href="/field-notes/">
+              Read all the field notes
+            </a>
+          </p>
+        </section>
+      )
+    }
+
+    {
+      films.length > 0 && (
+        <section class="py-10">
+          <h2 class="font-display text-3xl font-semibold">The films</h2>
+          <ul>
+            {films.slice(0, 3).map(e => (
+              <li class="border-border border-b py-6 last:border-b-0">
+                <p class="text-muted-foreground text-sm">
+                  Published {fmt(e.data.pubDatetime)}
+                  {e.data.duration ? `, runs ${e.data.duration}` : ""}
+                </p>
+                <h3 class="font-display mt-1 text-2xl font-semibold">
+                  <a class="hover:text-accent" href={`/videos/${e.id}/`}>
+                    {e.data.title}
+                  </a>
+                </h3>
+                <p class="mt-1 max-w-prose">{e.data.description}</p>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-2">
+            <a class="text-accent underline underline-offset-4" href="/videos/">
+              See all the films
+            </a>
+          </p>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+</Layout>
