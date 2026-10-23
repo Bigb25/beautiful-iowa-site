@@ -1,0 +1,38 @@
+/* Register design tokens for Tailwind v4 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --font-app: var(--font-libre-franklin);
+  --font-display: var(--font-newsreader);
+}
+
+/* Light theme values — the Beautiful Iowa masthead system.
+   Field Cream ground, Ink text, Masthead Green as the working accent,
+   Harvest Gold spent sparingly (rules, markers, the endmark). */
+:root,
+[data-theme="light"] {
+  --background: #f7f1e3;
+  --foreground: #262a22;
+  --accent: #1e3a2a;
+  --accent-foreground: #f7f1e3;
+  --muted: #ece2c8;
+  --muted-foreground: #626c58;
+  --border: #ddd2b2;
+}
+
+/* Dark theme values — Bottomland: the green deepened to near-black,
+   cream text, and Harvest Gold takes over as the accent. */
+[data-theme="dark"] {
+  --background: #14231b;
+  --foreground: #f3edda;
+  --accent: #c19a3d;
+  --accent-foreground: #14231b;
+  --muted: #1e3a2a;
+  --muted-foreground: #b3bda0;
+  --border: #2e4a39;
+}
