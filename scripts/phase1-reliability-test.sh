@@ -7,9 +7,18 @@ MARKER="phase1draftleakuniqueprobe6287"
 FIXTURE="src/content/towns/${SLUG}.md"
 HTML_TEST="dist/phase1-search-check.html"
 SERVER_PID=""
+BROWSER_PID=""
+PROFILE_DIR=""
 
 cleanup() {
   rm -f "$FIXTURE" "$HTML_TEST"
+  if [[ -n "$BROWSER_PID" ]]; then
+    kill "$BROWSER_PID" 2>/dev/null || true
+    wait "$BROWSER_PID" 2>/dev/null || true
+  fi
+  if [[ -n "$PROFILE_DIR" ]]; then
+    rm -rf "$PROFILE_DIR"
+  fi
   if [[ -n "$SERVER_PID" ]]; then
     kill "$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
@@ -136,23 +145,101 @@ if [[ -z "$CHROME" ]]; then
   exit 1
 fi
 
+# Keep a real headless browser session alive while Pagefind fetches its index.
+# --dump-dom can snapshot the page before asynchronous search work finishes.
+PROFILE_DIR=$(mktemp -d)
 "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
-  --disable-background-networking --virtual-time-budget=30000 --dump-dom \
+  --disable-background-networking --remote-debugging-port=9225 \
+  --remote-allow-origins='*' --user-data-dir="$PROFILE_DIR" \
   http://127.0.0.1:4181/phase1-search-check.html \
-  > /tmp/beautiful-iowa-phase1-browser.html \
-  2> /tmp/beautiful-iowa-phase1-chrome.log
+  > /tmp/beautiful-iowa-phase1-chrome.log 2>&1 &
+BROWSER_PID=$!
 
-if ! grep -Fq 'data-phase1-status="pass"' /tmp/beautiful-iowa-phase1-browser.html; then
-  echo "FAIL: served-dist browser/Pagefind verification failed"
-  grep -A 8 'id="result"' /tmp/beautiful-iowa-phase1-browser.html || true
-  tail -n 30 /tmp/beautiful-iowa-phase1-chrome.log || true
-  exit 1
-fi
+node --input-type=module <<'NODE'
+const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+let page;
 
-grep -Fq 'PASS Newton' /tmp/beautiful-iowa-phase1-browser.html
-echo "PASS Newton -> /towns/newton-jasper-county/"
-grep -Fq 'PASS Effigy Mounds' /tmp/beautiful-iowa-phase1-browser.html
-echo "PASS Effigy Mounds -> /places/effigy-mounds-national-monument/"
-grep -Fq 'PASS: draft marker absent from Pagefind search' /tmp/beautiful-iowa-phase1-browser.html
-echo "PASS: draft marker absent from Pagefind search"
-echo "PASS: live Pagefind queries worked on locally served plain dist"
+for (let attempt = 0; attempt < 120; attempt++) {
+  try {
+    const response = await fetch("http://127.0.0.1:9225/json/list");
+    if (response.ok) {
+      const targets = await response.json();
+      page = targets.find(
+        target =>
+          target.type === "page" &&
+          target.url.includes("phase1-search-check.html")
+      );
+      if (page) break;
+    }
+  } catch {
+    // Chrome hasn't opened its remote-debugging interface yet.
+  }
+  await pause(250);
+}
+if (!page) throw new Error("Chrome did not open the Pagefind test page");
+
+const socket = new WebSocket(page.webSocketDebuggerUrl);
+await new Promise((resolve, reject) => {
+  socket.addEventListener("open", resolve, { once: true });
+  socket.addEventListener("error", reject, { once: true });
+});
+
+let id = 0;
+const pending = new Map();
+socket.addEventListener("message", event => {
+  const message = JSON.parse(event.data);
+  if (!pending.has(message.id)) return;
+  pending.get(message.id)(message);
+  pending.delete(message.id);
+});
+
+async function readBrowserResult() {
+  const requestId = ++id;
+  const reply = new Promise(resolve => pending.set(requestId, resolve));
+  socket.send(
+    JSON.stringify({
+      id: requestId,
+      method: "Runtime.evaluate",
+      params: {
+        expression:
+          "({ status: document.body?.dataset.phase1Status ?? '', " +
+          "output: document.getElementById('result')?.textContent ?? '' })",
+        returnByValue: true,
+      },
+    })
+  );
+  const result = await reply;
+  if (result.error || result.result?.exceptionDetails) {
+    throw new Error("Chrome evaluation failed: " + JSON.stringify(result));
+  }
+  return result.result.result.value;
+}
+
+try {
+  let state;
+  for (let attempt = 0; attempt < 180; attempt++) {
+    state = await readBrowserResult();
+    if (state?.status === "pass" || state?.status === "fail") break;
+    await pause(250);
+  }
+
+  if (state?.status !== "pass") {
+    throw new Error("Pagefind browser check failed or timed out: " + JSON.stringify(state));
+  }
+
+  const expected = [
+    "PASS Newton -> /towns/newton-jasper-county/",
+    "PASS Effigy Mounds -> /places/effigy-mounds-national-monument/",
+    "PASS: draft marker absent from Pagefind search",
+  ];
+  for (const line of expected) {
+    if (!state.output.includes(line)) {
+      throw new Error("Missing Pagefind check: " + line + "; got " + state.output);
+    }
+  }
+  console.log(state.output);
+  console.log("PASS: live Pagefind queries worked on locally served plain dist");
+} finally {
+  socket.close();
+}
+NODE
