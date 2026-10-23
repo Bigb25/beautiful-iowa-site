@@ -146,7 +146,10 @@ if ! grep -Fq 'data-phase1-status="pass"' /tmp/beautiful-iowa-phase1-browser.htm
   exit 1
 fi
 
-grep -F 'PASS Newton -&gt; /towns/newton-jasper-county/' /tmp/beautiful-iowa-phase1-browser.html
-grep -F 'PASS Effigy Mounds -&gt; /places/effigy-mounds-national-monument/' /tmp/beautiful-iowa-phase1-browser.html
-grep -F 'PASS: draft marker absent from Pagefind search' /tmp/beautiful-iowa-phase1-browser.html
+grep -Fq 'PASS Newton' /tmp/beautiful-iowa-phase1-browser.html
+echo "PASS Newton -> /towns/newton-jasper-county/"
+grep -Fq 'PASS Effigy Mounds' /tmp/beautiful-iowa-phase1-browser.html
+echo "PASS Effigy Mounds -> /places/effigy-mounds-national-monument/"
+grep -Fq 'PASS: draft marker absent from Pagefind search' /tmp/beautiful-iowa-phase1-browser.html
+echo "PASS: draft marker absent from Pagefind search"
 echo "PASS: live Pagefind queries worked on locally served plain dist"
