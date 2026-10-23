@@ -1,0 +1,54 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+const entries = (await getCollection("videos", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
+);
+const fmt = (d: Date) =>
+  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+---
+
+<Layout
+  title="Videos | Beautiful Iowa"
+  description="Every Beautiful Iowa film, kept here with the story behind it and the sources for everything it shows."
+>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section class="border-border border-b pt-10 pb-8">
+      <h1 class="font-display text-5xl font-semibold">The films</h1>
+      <p class="mt-4 max-w-prose text-lg">
+        The Beautiful Iowa channel tells two kinds of stories on film: town
+        stories, built from the photographs and records a place left behind,
+        and field films from the road. Each one gets a page here, with the
+        story behind it and the sources for everything it shows. Watch on
+        <a
+          class="text-accent underline underline-offset-4"
+          href="https://www.youtube.com/@BeautifulIowa">YouTube</a
+        >.
+      </p>
+    </section>
+    <ul>
+      {
+        entries.map(e => (
+          <li class="border-border border-b py-7">
+            <p class="text-muted-foreground text-sm">
+              Published {fmt(e.data.pubDatetime)}
+              {e.data.duration ? `, runs ${e.data.duration}` : ""}
+              {e.data.town ? `, filmed in ${e.data.town}` : ""}
+            </p>
+            <h2 class="font-display mt-2 text-3xl font-semibold">
+              <a class="hover:text-accent" href={`/videos/${e.id}/`}>
+                {e.data.title}
+              </a>
+            </h2>
+            <p class="mt-2 max-w-prose">{e.data.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+  <Footer />
+</Layout>
