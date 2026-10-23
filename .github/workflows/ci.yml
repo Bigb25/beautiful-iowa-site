@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           npm ci
-          npx prettier --list-different . | sort > /tmp/expected-by-prettier.txt
+          npx prettier --list-different . | sort > /tmp/expected-by-prettier.txt || true
           npm run format
           git diff --name-only | sort > /tmp/actual.txt
           cat > /tmp/approved.txt <<'APPROVED'
