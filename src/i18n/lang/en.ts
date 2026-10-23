@@ -6,6 +6,7 @@ export default {
     posts: "Posts",
     tags: "Tags",
     towns: "Towns",
+    places: "Places",
     fieldNotes: "Field Notes",
     videos: "Videos",
     about: "About",
