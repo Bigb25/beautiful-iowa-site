@@ -27,7 +27,7 @@ const locale = Astro.currentLocale ?? config.site.lang;
       { "text-lg": size === "lg" },
     ]}
   >
-    <IconHash
+    <IconHash aria-hidden="true"
       class:list={[
         "opacity-80",
         { "size-5": size === "lg" },
