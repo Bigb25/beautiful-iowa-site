@@ -34,11 +34,11 @@ jobs:
       - name: "🔎 Lint code"
         run: npm run lint
 
-      - name: "📝 Checking code format"
-        run: npm run format:check
-
       - name: "🚀 Typecheck, build, and index with Pagefind"
         run: npm run build
 
       - name: "🧪 Draft exclusion and locally served search regression"
         run: bash scripts/phase1-reliability-test.sh
+
+      - name: "📝 Checking code format"
+        run: npm run format:check
