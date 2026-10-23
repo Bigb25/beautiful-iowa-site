@@ -69,10 +69,12 @@ cat > "$HTML_TEST" <<'HTML'
   <head><meta charset="utf-8"><title>Phase 1 Pagefind check</title></head>
   <body>
     <pre id="result">Searches have not completed.</pre>
-    <script type="module">
+    <script>
+      (async () => {
       const output = document.querySelector("#result");
       try {
         const pagefind = await import("/pagefind/pagefind.js");
+        await pagefind.options({ noWorker: true });
         const checks = [
           ["Newton", "/towns/newton-jasper-county/"],
           ["Effigy Mounds", "/places/effigy-mounds-national-monument/"],
@@ -100,6 +102,7 @@ cat > "$HTML_TEST" <<'HTML'
         document.body.dataset.phase1Status = "fail";
         output.textContent = "FAIL: " + String(error);
       }
+      })();
     </script>
   </body>
 </html>
