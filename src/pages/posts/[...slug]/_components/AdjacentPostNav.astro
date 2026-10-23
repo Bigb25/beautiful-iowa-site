@@ -5,21 +5,25 @@ import { getPostUrl } from "@/utils/getPostPaths";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
+
 type AdjacentPost = {
   id: string;
   title: string;
   filePath: string | undefined;
 } | null;
 
+
 type Props = {
   prevPost: AdjacentPost;
   nextPost: AdjacentPost;
 };
 
+
 const { prevPost, nextPost } = Astro.props;
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
 ---
+
 
 <div data-pagefind-ignore class="my-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
   {
@@ -28,7 +32,7 @@ const t = useTranslations(locale);
         href={getPostUrl(prevPost.id, prevPost.filePath, locale)}
         class="flex w-full gap-1 hover:opacity-75"
       >
-        <IconArrowLeft class="inline-block flex-none rtl:rotate-180" />
+        <IconArrowLeft aria-hidden="true" class="inline-block flex-none rtl:rotate-180" />
         <div>
           <span>{t.post.previousPost}</span>
           <div class="text-accent/85 text-sm">{prevPost.title}</div>
@@ -46,7 +50,7 @@ const t = useTranslations(locale);
           <span>{t.post.nextPost}</span>
           <div class="text-accent/85 text-sm">{nextPost.title}</div>
         </div>
-        <IconArrowRight class="inline-block flex-none rtl:rotate-180" />
+        <IconArrowRight aria-hidden="true" class="inline-block flex-none rtl:rotate-180" />
       </a>
     )
   }
