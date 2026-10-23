@@ -1,0 +1,55 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("places");
+  return entries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<Layout title={`${d.title} | Beautiful Iowa`} description={d.description}>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <article class="pt-10 pb-4">
+      <h1 class="font-display text-4xl leading-tight font-semibold sm:text-5xl">
+        {d.title}
+      </h1>
+      <p class="text-muted-foreground mt-4">
+        {d.place}, {d.county}
+        {d.region ? ` — ${d.region}` : ""}
+      </p>
+      {
+        d.heroImage && (
+          <figure class="mt-8">
+            <img
+              src={d.heroImage}
+              alt={d.heroCaption ?? ""}
+              width={d.heroImageWidth}
+              height={d.heroImageHeight}
+              class="w-full"
+            />
+            {d.heroCaption && (
+              <figcaption class="text-muted-foreground mt-2 text-sm">
+                {d.heroCaption}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+      <div class="app-prose font-display mt-8 max-w-none">
+        <Content />
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>
