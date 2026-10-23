@@ -16,31 +16,29 @@ jobs:
   build:
     name: Code standards & build
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 10
 
     steps:
       - name: "☁️ Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "📦 Install pnpm"
-        uses: pnpm/action-setup@v4
-        with:
-          version: "11.3.0"
-
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "pnpm"
+          cache: "npm"
 
       - name: "📦 Install dependencies"
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: "🔎 Lint code"
-        run: pnpm run lint
+        run: npm run lint
 
       - name: "📝 Checking code format"
-        run: pnpm run format:check
+        run: npm run format:check
 
-      - name: "🚀 Build the project"
-        run: pnpm run build
+      - name: "🚀 Typecheck, build, and index with Pagefind"
+        run: npm run build
+
+      - name: "🧪 Draft exclusion and locally served search regression"
+        run: bash scripts/phase1-reliability-test.sh
