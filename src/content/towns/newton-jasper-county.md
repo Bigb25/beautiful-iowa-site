@@ -5,6 +5,8 @@ county: "Jasper County"
 pubDatetime: 2026-11-02
 description: "SAMPLE ENTRY. The first town in the archive: John Vachon's 1940 view of downtown Newton, and the Newton Daily News of November 2, 1929, when 150 Maytag salesmen rode in on a special train."
 heroImage: "/images/newton-downtown-1940.jpg"
+heroImageWidth: 750
+heroImageHeight: 1024
 heroCaption: "Downtown Newton, April 1940. Photograph by John Vachon for the Farm Security Administration. Library of Congress, no known restrictions."
 sourceNote: "Photograph: Library of Congress, FSA/OWI, item 2017719982. Newspaper items: The Newton Daily News, Saturday, November 2, 1929, page 1, read on the page image in the Newton Public Library digital archive."
 featured: true
