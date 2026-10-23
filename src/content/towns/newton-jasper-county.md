@@ -22,7 +22,7 @@ in an upstairs window, a shoe-shine and hat-cleaning parlor, and the Invisible
 Shoe Repairing shop, with a second little sign for it down on the sidewalk.
 Bicycles lean at the curb, and a boy is crossing the street mid-frame.
 
-Eleven years earlier, on Saturday, November 2, 1929, the *Newton Daily News*
+Eleven years earlier, on Saturday, November 2, 1929, the _Newton Daily News_
 announced "Maytagers to Convene Here": about 150 Maytag salesmen, dealers and
 district managers were coming to Newton on a special train, due in Monday
 morning at 8:45, for two days of factory trips, a luncheon and pep meeting at

@@ -4,19 +4,32 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 
-const byDateDesc = (a: { data: { pubDatetime: Date } }, b: { data: { pubDatetime: Date } }) =>
-  b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime();
+const byDateDesc = (
+  a: { data: { pubDatetime: Date } },
+  b: { data: { pubDatetime: Date } }
+) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime();
 
-const towns = (await getCollection("towns", ({ data }) => !data.draft)).sort(byDateDesc);
-const places = (await getCollection("places", ({ data }) => !data.draft)).sort(byDateDesc);
-const notes = (await getCollection("field-notes", ({ data }) => !data.draft)).sort(byDateDesc);
-const films = (await getCollection("videos", ({ data }) => !data.draft)).sort(byDateDesc);
+const towns = (await getCollection("towns", ({ data }) => !data.draft)).sort(
+  byDateDesc
+);
+const places = (await getCollection("places", ({ data }) => !data.draft)).sort(
+  byDateDesc
+);
+const notes = (
+  await getCollection("field-notes", ({ data }) => !data.draft)
+).sort(byDateDesc);
+const films = (await getCollection("videos", ({ data }) => !data.draft)).sort(
+  byDateDesc
+);
 
 const currentTown = towns[0];
 const latestPlace = places[0];
 
 const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+  new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(d);
 ---
 
 <Layout>
@@ -37,10 +50,14 @@ const fmt = (d: Date) =>
             class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1e3a2a]/85 via-[#1e3a2a]/35 to-transparent pt-24 pb-6"
           >
             <div class="app-layout">
-              <h1 class="font-display text-6xl font-semibold text-[#f7f1e3] sm:text-7xl">
+              <h1
+                class="font-display text-6xl font-semibold text-[#f7f1e3] sm:text-7xl"
+              >
                 Beautiful Iowa
               </h1>
-              <p class="font-display mt-3 max-w-prose text-xl text-[#f7f1e3]/90 italic">
+              <p
+                class="font-display mt-3 max-w-prose text-xl text-[#f7f1e3]/90 italic"
+              >
                 River bluffs and state parks, small-town main streets and back
                 roads, and the stories they keep.
               </p>
@@ -67,7 +84,9 @@ const fmt = (d: Date) =>
     {
       currentTown && (
         <section class="border-border border-b py-10">
-          <h2 class="font-display text-3xl font-semibold">From the town archive</h2>
+          <h2 class="font-display text-3xl font-semibold">
+            From the town archive
+          </h2>
           <p class="text-muted-foreground mt-3 text-sm">
             {currentTown.data.town}, {currentTown.data.county}, in the week of{" "}
             {fmt(currentTown.data.pubDatetime)}
@@ -141,7 +160,10 @@ const fmt = (d: Date) =>
             ))}
           </ul>
           <p class="mt-2">
-            <a class="text-accent underline underline-offset-4" href="/field-notes/">
+            <a
+              class="text-accent underline underline-offset-4"
+              href="/field-notes/"
+            >
               Read all the field notes
             </a>
           </p>

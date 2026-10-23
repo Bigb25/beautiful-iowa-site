@@ -39,7 +39,10 @@ const t = useTranslations(Astro.currentLocale);
         aria-label={t.a11y.goToNextPage}
       >
         {t.pagination.next}
-        <IconArrowRight aria-hidden="true" class="inline-block rtl:rotate-180" />
+        <IconArrowRight
+          aria-hidden="true"
+          class="inline-block rtl:rotate-180"
+        />
       </LinkButton>
     </nav>
   )

@@ -8,7 +8,10 @@ const entries = (await getCollection("towns", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
 );
 const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(d);
+  new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(d);
 ---
 
 <Layout
@@ -22,8 +25,8 @@ const fmt = (d: Date) =>
       <p class="mt-4 max-w-prose text-lg">
         Iowa, On This Day takes one Iowa town at a time and tells its story from
         the photographs, newspapers, and records the town left behind. The
-        week's posts live here permanently, where they can be searched and
-        kept, long after they have scrolled past on the Page.
+        week's posts live here permanently, where they can be searched and kept,
+        long after they have scrolled past on the Page.
       </p>
     </section>
     <ul>
@@ -31,7 +34,8 @@ const fmt = (d: Date) =>
         entries.map(e => (
           <li class="border-border border-b py-7">
             <p class="text-muted-foreground text-sm">
-              {e.data.town}, {e.data.county}, in the week of {fmt(e.data.pubDatetime)}
+              {e.data.town}, {e.data.county}, in the week of{" "}
+              {fmt(e.data.pubDatetime)}
             </p>
             <h2 class="font-display mt-2 text-3xl font-semibold">
               <a class="hover:text-accent" href={`/towns/${e.id}/`}>

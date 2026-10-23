@@ -13,21 +13,18 @@ import config from "@/config";
 export const GET: APIRoute = async () => {
   /* Fonts are vendored in the source tree; resolve from the project root
    (the build always runs there), not from the bundled chunk location. */
-const fontPath = (name: string) => join(process.cwd(), "src/assets/fonts", name);
+  const fontPath = (name: string) =>
+    join(process.cwd(), "src/assets/fonts", name);
 
-const toArrayBuffer = (buf: Buffer): ArrayBuffer =>
+  const toArrayBuffer = (buf: Buffer): ArrayBuffer =>
     buf.buffer.slice(
       buf.byteOffset,
       buf.byteOffset + buf.byteLength
     ) as ArrayBuffer;
 
   const [regularData, boldData] = await Promise.all([
-    readFile(fontPath("libre-franklin-400.ttf")).then(
-      toArrayBuffer
-    ),
-    readFile(fontPath("libre-franklin-700.ttf")).then(
-      toArrayBuffer
-    ),
+    readFile(fontPath("libre-franklin-400.ttf")).then(toArrayBuffer),
+    readFile(fontPath("libre-franklin-700.ttf")).then(toArrayBuffer),
   ]);
 
   const svg = await satori(
