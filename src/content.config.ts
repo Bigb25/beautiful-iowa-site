@@ -36,6 +36,7 @@ const pages = defineCollection({
 
 /* Beautiful Iowa collections (see ~/workspace/beautiful-iowa-site/SITE_PLAN.md).
    towns       — the Iowa, On This Day archive: one entry per town week.
+   places      — the standing gazetteer: parks, forests, rivers, landmarks.
    field-notes — the blog of places we go.
    videos      — a permanent page for every Beautiful Iowa film. */
 
@@ -48,8 +49,28 @@ const towns = defineCollection({
     pubDatetime: z.date(),
     description: z.string(),
     heroImage: z.string().optional(),
+    heroImageWidth: z.number().optional(),
+    heroImageHeight: z.number().optional(),
     heroCaption: z.string().optional(),
     sourceNote: z.string().optional(),
+    featured: z.boolean().optional(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+const places = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/places" }),
+  schema: z.object({
+    title: z.string(),
+    place: z.string(),
+    county: z.string(),
+    region: z.string().optional(),
+    pubDatetime: z.date(),
+    description: z.string(),
+    heroImage: z.string().optional(),
+    heroImageWidth: z.number().optional(),
+    heroImageHeight: z.number().optional(),
+    heroCaption: z.string().optional(),
     featured: z.boolean().optional(),
     draft: z.boolean().optional(),
   }),
@@ -90,6 +111,7 @@ export const collections = {
   posts,
   pages,
   towns,
+  places,
   "field-notes": fieldNotes,
   videos,
 };
