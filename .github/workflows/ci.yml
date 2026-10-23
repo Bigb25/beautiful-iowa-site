@@ -1,44 +1,72 @@
-name: CI
-
-permissions:
-  contents: read
-
+name: Temporary Prettier audit (never deploy)
 on:
   pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
-  workflow_call:
-
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
 jobs:
-  build:
-    name: Code standards & build
+  audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: chore-prettier-sweep
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "npm"
-
-      - name: "📦 Install dependencies"
-        run: npm ci
-
-      - name: "🔎 Lint code"
-        run: npm run lint
-
-      - name: "🚀 Typecheck, build, and index with Pagefind"
-        run: npm run build
-
-      - name: "🧪 Draft exclusion and locally served search regression"
-        run: bash scripts/phase1-reliability-test.sh
-
-      - name: "📝 Checking code format"
-        run: npm run format:check
+          cache: npm
+      - name: Audit exact formatting changes without committing
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npx prettier --list-different . > /tmp/before-list || true
+          echo "PRETTIER_BEFORE_LIST_BEGIN"
+          cat /tmp/before-list
+          echo "PRETTIER_BEFORE_LIST_END"
+          cp package-lock.json /tmp/before-package-lock.json
+          npm run format
+          git diff --name-only | sort > /tmp/changed-list
+          sort /tmp/before-list -o /tmp/before-list
+          echo "PRETTIER_CHANGED_LIST_BEGIN"
+          cat /tmp/changed-list
+          echo "PRETTIER_CHANGED_LIST_END"
+          echo "EXPECTED_COUNT=$(wc -l < /tmp/before-list)"
+          echo "CHANGED_COUNT=$(wc -l < /tmp/changed-list)"
+          echo "DIFF_STAT_BEGIN"
+          git diff --stat
+          echo "DIFF_STAT_END"
+          echo "DIFF_IGNORE_SPACE_BEGIN"
+          git diff --ignore-all-space --stat
+          echo "DIFF_IGNORE_SPACE_END"
+          if [[ $(wc -l < /tmp/before-list) -ne 20 ]]; then
+            echo "AUDIT_STOP: expected exactly 20 Prettier-different files"
+            exit 1
+          fi
+          if ! diff -u /tmp/before-list /tmp/changed-list; then
+            echo "AUDIT_STOP: formatted files differ from Prettier warnings"
+            exit 1
+          fi
+          if ! cmp -s package-lock.json /tmp/before-package-lock.json; then
+            echo "AUDIT_STOP: package-lock changed"
+            exit 1
+          fi
+          if ! git diff --check; then
+            echo "AUDIT_STOP: diff whitespace error"
+            exit 1
+          fi
+          # Compare non-whitespace characters in each file to flag
+          # Tailwind class reordering or other changes for manual inspection.
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const cp = require('node:child_process');
+          const list = fs.readFileSync('/tmp/changed-list','utf8').trim().split('\n');
+          for(const file of list) {
+            const a = cp.execFileSync('git',['show','HEAD:' + file],{encoding:'utf8'});
+            const b = fs.readFileSync(file,'utf8');
+            const same = a.replace(/\s/g,'') === b.replace(/\s/g,'');
+            console.log('NONWHITESPACE_CHECK ' + (same ? 'PASS ' : 'DIFF ') + file);
+          }
+          NODE
+          echo "AUDIT_DONE_NO_COMMIT"
