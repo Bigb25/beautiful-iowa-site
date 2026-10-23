@@ -34,7 +34,13 @@ const dateStr = new Intl.DateTimeFormat("en-US", {
       {
         d.heroImage && (
           <figure class="mt-8">
-            <img src={d.heroImage} alt={d.heroCaption ?? ""} class="w-full" />
+            <img
+              src={d.heroImage}
+              alt={d.heroCaption ?? ""}
+              width={d.heroImageWidth}
+              height={d.heroImageHeight}
+              class="w-full"
+            />
             {d.heroCaption && (
               <figcaption class="text-muted-foreground mt-2 text-sm">
                 {d.heroCaption}
