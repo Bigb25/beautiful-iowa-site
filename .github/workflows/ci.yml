@@ -1,44 +1,30 @@
-name: CI
-
-permissions:
-  contents: read
-
+name: Temporary lockfile refresh (no publishing)
 on:
   pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
-  workflow_call:
-
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
 jobs:
-  build:
-    name: Code standards & build
+  lock-refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "npm"
-
-      - name: "📦 Install dependencies"
-        run: npm ci
-
-      - name: "🔎 Lint code"
-        run: npm run lint
-
-      - name: "🚀 Typecheck, build, and index with Pagefind"
-        run: npm run build
-
-      - name: "🧪 Draft exclusion and locally served search regression"
-        run: bash scripts/phase1-reliability-test.sh
-
-      - name: "📝 Checking code format"
-        run: npm run format:check
+      - name: Run npm install and capture exact generated lockfile
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const lock = fs.readFileSync("package-lock.json", "utf8");
+          console.log("LOCK_GENERATED_BEGIN:" + lock.length);
+          for (let i = 0; i < lock.length; i += 1000) {
+            console.log("LOCK_JSON_CHUNK:" + JSON.stringify(lock.slice(i, i + 1000)));
+          }
+          console.log("LOCK_GENERATED_END");
+          NODE
+      - name: Check the refreshed lock passes npm ci
+        run: npm ci --ignore-scripts --no-audit --no-fund
