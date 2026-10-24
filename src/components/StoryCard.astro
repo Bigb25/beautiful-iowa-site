@@ -1,0 +1,57 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  kicker: string;
+  heroImage?: string;
+  heroImageWidth?: number;
+  heroImageHeight?: number;
+  heroCaption?: string;
+  badge?: string;
+}
+
+const {
+  href,
+  title,
+  description,
+  kicker,
+  heroImage,
+  heroImageWidth,
+  heroImageHeight,
+  heroCaption,
+  badge,
+} = Astro.props;
+---
+
+<article class="group relative">
+  {
+    heroImage && (
+      <img
+        src={heroImage}
+        alt={heroCaption ?? title}
+        width={heroImageWidth}
+        height={heroImageHeight}
+        loading="lazy"
+        class="aspect-[4/3] w-full object-cover"
+      />
+    )
+  }
+  {
+    badge && (
+      <p class="text-muted-foreground mt-4 text-xs font-semibold tracking-wide uppercase">
+        {badge}
+      </p>
+    )
+  }
+  <p class="text-muted-foreground mt-4 text-sm">{kicker}</p>
+  <h2 class="font-display mt-2 text-3xl font-semibold">
+    <a
+      class="hover:text-accent group-hover:text-accent after:absolute after:inset-0 after:content-['']"
+      href={href}
+    >
+      {title}
+    </a>
+  </h2>
+  <p class="mt-2">{description}</p>
+</article>
