@@ -29,7 +29,11 @@ const dateStr = new Intl.DateTimeFormat("en-US", {
         {d.title}
       </h1>
       <p class="text-muted-foreground mt-4">
-        Published {dateStr}{d.duration ? `, runs ${d.duration}` : ""}
+        {
+          d.youtubeId
+            ? `Published ${dateStr}${d.duration ? `, runs ${d.duration}` : ""}`
+            : "Preview"
+        }
       </p>
       {
         d.youtubeId ? (
