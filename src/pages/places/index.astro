@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import StoryCard from "@/components/StoryCard.astro";
 
 const entries = (await getCollection("places", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
@@ -24,20 +25,20 @@ const entries = (await getCollection("places", ({ data }) => !data.draft)).sort(
         drive — kept standing here where they can be searched and kept.
       </p>
     </section>
-    <ul>
+    <ul class="grid grid-cols-1 gap-x-8 gap-y-12 pt-10 pb-4 sm:grid-cols-2">
       {
         entries.map(e => (
-          <li class="border-border border-b py-7">
-            <p class="text-muted-foreground text-sm">
-              {e.data.place}, {e.data.county}
-              {e.data.region ? ` — ${e.data.region}` : ""}
-            </p>
-            <h2 class="font-display mt-2 text-3xl font-semibold">
-              <a class="hover:text-accent" href={`/places/${e.id}/`}>
-                {e.data.title}
-              </a>
-            </h2>
-            <p class="mt-2 max-w-prose">{e.data.description}</p>
+          <li>
+            <StoryCard
+              href={`/places/${e.id}/`}
+              title={e.data.title}
+              description={e.data.description}
+              kicker={`${e.data.place}, ${e.data.county}${e.data.region ? ` — ${e.data.region}` : ""}`}
+              heroImage={e.data.heroImage}
+              heroImageWidth={e.data.heroImageWidth}
+              heroImageHeight={e.data.heroImageHeight}
+              heroCaption={e.data.heroCaption}
+            />
           </li>
         ))
       }
