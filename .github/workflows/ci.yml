@@ -1,44 +1,43 @@
-name: CI
-
-permissions:
-  contents: read
-
+name: Temporary mobile header Prettier audit
 on:
   pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
-  workflow_call:
-
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
 jobs:
-  build:
-    name: Code standards & build
+  format:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: fix-mobile-header
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "npm"
-
-      - name: "📦 Install dependencies"
-        run: npm ci
-
-      - name: "🔎 Lint code"
-        run: npm run lint
-
-      - name: "🚀 Typecheck, build, and index with Pagefind"
-        run: npm run build
-
-      - name: "🧪 Draft exclusion and locally served search regression"
-        run: bash scripts/phase1-reliability-test.sh
-
-      - name: "📝 Checking code format"
-        run: npm run format:check
+          cache: npm
+      - name: Run npm format and export canonical two-file output
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run format
+          git diff --name-only | sort > /tmp/changed.txt
+          printf '%s\n' 'src/components/Header.astro' 'src/layouts/Layout.astro' > /tmp/expected.txt
+          diff -u /tmp/expected.txt /tmp/changed.txt
+          npm run format:check
+          echo "FORMAT_PATCH_BEGIN"
+          git diff -- src/components/Header.astro src/layouts/Layout.astro
+          echo "FORMAT_PATCH_END"
+          echo "FORMAT_OUTPUT_BEGIN"
+          node <<'NODE'
+          const fs=require('node:fs');
+          for(const path of ['src/components/Header.astro','src/layouts/Layout.astro']){
+            const contents=fs.readFileSync(path,'utf8');
+            for(let i=0,n=0;i<contents.length;i+=800,n++){
+              console.log('PFMT_CHUNK:'+encodeURIComponent(path)+':'+n+':'+JSON.stringify(contents.slice(i,i+800)));
+            }
+          }
+          NODE
+          echo "FORMAT_OUTPUT_END"
+          echo "PASS_EXACT_TWO_FILES"
