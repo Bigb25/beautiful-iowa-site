@@ -3,6 +3,9 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import config from "@/config";
+
+const youtubeUrl = config.socials.find(s => s.name === "youtube")?.url;
 
 const byDateDesc = (
   a: { data: { pubDatetime: Date } },
@@ -61,6 +64,26 @@ const fmt = (d: Date) =>
                 River bluffs and state parks, small-town main streets and back
                 roads, and the stories they keep.
               </p>
+              <div class="mt-6 flex flex-wrap gap-3">
+                {
+                  youtubeUrl && (
+                    <a
+                      href={youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="rounded bg-[#f7f1e3] px-5 py-2.5 font-medium text-[#1e3a2a] focus:outline-2 focus:outline-offset-2 focus:outline-[#f7f1e3]"
+                    >
+                      Watch on YouTube
+                    </a>
+                  )
+                }
+                <a
+                  href="#stories"
+                  class="rounded border border-[#f7f1e3]/70 px-5 py-2.5 font-medium text-[#f7f1e3] focus:outline-2 focus:outline-offset-2 focus:outline-[#f7f1e3]"
+                >
+                  Explore the stories
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -83,7 +106,7 @@ const fmt = (d: Date) =>
     </section>
     {
       currentTown && (
-        <section class="border-border border-b py-10">
+        <section id="stories" class="border-border border-b py-10">
           <h2 class="font-display text-3xl font-semibold">
             From the town archive
           </h2>
