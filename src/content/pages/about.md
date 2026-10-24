@@ -8,7 +8,8 @@ state parks in every season, small-town main streets, back roads, and the
 hidden corners most people drive past for years before finally stopping. We
 film and photograph the Iowa that is still standing — the overlooks and the
 waterfalls, the courthouses and the covered bridges, the quiet places and the
-famous ones.
+famous ones. The town stories also appear on Iowa, On This Day, our companion
+Facebook Page.
 
 Three things live here, under one roof:
 
