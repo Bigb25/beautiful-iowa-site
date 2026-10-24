@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import StoryCard from "@/components/StoryCard.astro";
 import config from "@/config";
 
 const youtubeUrl = config.socials.find(s => s.name === "youtube")?.url;
@@ -133,27 +134,18 @@ const fmt = (d: Date) =>
       latestPlace && (
         <section class="border-border border-b py-10">
           <h2 class="font-display text-3xl font-semibold">Places</h2>
-          <p class="text-muted-foreground mt-3 text-sm">
-            {latestPlace.data.place}, {latestPlace.data.county}
-            {latestPlace.data.region ? ` — ${latestPlace.data.region}` : ""}
-          </p>
-          {latestPlace.data.heroImage && (
-            <figure class="mt-4">
-              <img
-                src={latestPlace.data.heroImage}
-                alt={latestPlace.data.heroCaption ?? ""}
-                width={latestPlace.data.heroImageWidth}
-                height={latestPlace.data.heroImageHeight}
-                class="w-full"
-              />
-            </figure>
-          )}
-          <h3 class="font-display mt-4 text-4xl leading-tight font-semibold">
-            <a class="hover:text-accent" href={`/places/${latestPlace.id}/`}>
-              {latestPlace.data.title}
-            </a>
-          </h3>
-          <p class="mt-3 max-w-prose">{latestPlace.data.description}</p>
+          <div class="mt-4">
+            <StoryCard
+              href={`/places/${latestPlace.id}/`}
+              title={latestPlace.data.title}
+              description={latestPlace.data.description}
+              kicker={`${latestPlace.data.place}, ${latestPlace.data.county}${latestPlace.data.region ? ` — ${latestPlace.data.region}` : ""}`}
+              heroImage={latestPlace.data.heroImage}
+              heroImageWidth={latestPlace.data.heroImageWidth}
+              heroImageHeight={latestPlace.data.heroImageHeight}
+              heroCaption={latestPlace.data.heroCaption}
+            />
+          </div>
           <p class="mt-5">
             <a class="text-accent underline underline-offset-4" href="/places/">
               See all the places
@@ -167,21 +159,16 @@ const fmt = (d: Date) =>
       notes.length > 0 && (
         <section class="border-border border-b py-10">
           <h2 class="font-display text-3xl font-semibold">Field notes</h2>
-          <ul>
-            {notes.slice(0, 3).map(e => (
-              <li class="border-border border-b py-6 last:border-b-0">
-                <p class="text-muted-foreground text-sm">
-                  {e.data.location}, on {fmt(e.data.pubDatetime)}
-                </p>
-                <h3 class="font-display mt-1 text-2xl font-semibold">
-                  <a class="hover:text-accent" href={`/field-notes/${e.id}/`}>
-                    {e.data.title}
-                  </a>
-                </h3>
-                <p class="mt-1 max-w-prose">{e.data.description}</p>
-              </li>
-            ))}
-          </ul>
+          <div class="mt-4">
+            <StoryCard
+              href={`/field-notes/${notes[0].id}/`}
+              title={notes[0].data.title}
+              description={notes[0].data.description}
+              kicker={`${notes[0].data.location}, on ${fmt(notes[0].data.pubDatetime)}`}
+              heroImage={notes[0].data.heroImage}
+              heroCaption={notes[0].data.heroCaption}
+            />
+          </div>
           <p class="mt-2">
             <a
               class="text-accent underline underline-offset-4"
