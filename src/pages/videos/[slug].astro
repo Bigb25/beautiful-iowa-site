@@ -3,6 +3,8 @@ import { getCollection, render } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import ContinueExploring from "@/components/ContinueExploring.astro";
+import { relatedForVideo } from "@/utils/related";
 
 export async function getStaticPaths() {
   const entries = await getCollection("videos", ({ data }) => !data.draft);
@@ -15,6 +17,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
+const towns = await getCollection("towns", ({ data }) => !data.draft);
+const related = relatedForVideo(entry, towns);
 const dateStr = new Intl.DateTimeFormat("en-US", {
   dateStyle: "long",
   timeZone: "UTC",
@@ -62,6 +66,11 @@ const dateStr = new Intl.DateTimeFormat("en-US", {
       <div class="app-prose font-display mt-8 max-w-none">
         <Content />
       </div>
+      <ContinueExploring
+        links={related}
+        sectionHref="/videos/"
+        sectionLabel="See all the films"
+      />
     </article>
   </main>
   <Footer />
