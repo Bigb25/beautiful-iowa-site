@@ -1,0 +1,36 @@
+---
+import type { RelatedLink } from "@/utils/related";
+
+interface Props {
+  links: RelatedLink[];
+  sectionHref: string;
+  sectionLabel: string;
+}
+
+const { links, sectionHref, sectionLabel } = Astro.props;
+---
+
+<nav class="border-border mt-12 border-t pt-8" aria-label="Continue exploring">
+  <h2 class="font-display text-3xl font-semibold">Continue exploring</h2>
+  {
+    links.length > 0 && (
+      <ul>
+        {links.map(link => (
+          <li class="border-border border-b py-6 last:border-b-0">
+            <p class="text-muted-foreground text-sm">{link.kicker}</p>
+            <h3 class="font-display mt-1 text-2xl font-semibold">
+              <a class="hover:text-accent" href={link.href}>
+                {link.title}
+              </a>
+            </h3>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  <p class="mt-5">
+    <a class="text-accent underline underline-offset-4" href={sectionHref}>
+      {sectionLabel}
+    </a>
+  </p>
+</nav>
