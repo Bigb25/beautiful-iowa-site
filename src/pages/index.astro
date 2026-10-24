@@ -179,8 +179,14 @@ const fmt = (d: Date) =>
             {films.slice(0, 3).map(e => (
               <li class="border-border border-b py-6 last:border-b-0">
                 <p class="text-muted-foreground text-sm">
-                  Published {fmt(e.data.pubDatetime)}
-                  {e.data.duration ? `, runs ${e.data.duration}` : ""}
+                  {e.data.youtubeId ? (
+                    <>
+                      Published {fmt(e.data.pubDatetime)}
+                      {e.data.duration ? `, runs ${e.data.duration}` : ""}
+                    </>
+                  ) : (
+                    "Preview"
+                  )}
                 </p>
                 <h3 class="font-display mt-1 text-2xl font-semibold">
                   <a class="hover:text-accent" href={`/videos/${e.id}/`}>
