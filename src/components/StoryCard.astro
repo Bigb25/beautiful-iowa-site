@@ -3,7 +3,7 @@ interface Props {
   href: string;
   title: string;
   description: string;
-  kicker: string;
+  kicker?: string;
   heroImage?: string;
   heroImageWidth?: number;
   heroImageHeight?: number;
@@ -44,7 +44,7 @@ const {
       </p>
     )
   }
-  <p class="text-muted-foreground mt-4 text-sm">{kicker}</p>
+  {kicker && <p class="text-muted-foreground mt-4 text-sm">{kicker}</p>}
   <h2 class="font-display mt-2 text-3xl font-semibold">
     <a
       class="hover:text-accent group-hover:text-accent after:absolute after:inset-0 after:content-['']"
